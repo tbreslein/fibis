@@ -3,8 +3,6 @@ use std::{
     panic::{RefUnwindSafe, UnwindSafe},
 };
 
-use num_integer::Integer;
-
 type InputType = usize;
 type BackingType = u64;
 const BIT_WIDTH: InputType = BackingType::BITS as InputType;
@@ -116,7 +114,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
 
     /// Returns the array index and bit position for an element x.
     fn position(x: usize) -> (usize, usize) {
-        x.div_mod_floor(&BIT_WIDTH)
+        (x / BIT_WIDTH, x % BIT_WIDTH)
     }
 
     /// Return whether an item is part of the set.
