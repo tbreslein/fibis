@@ -71,7 +71,10 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// assert_eq!(foo.len(), 2);
     /// ```
     pub fn len(&self) -> usize {
-        debug_assert_eq!(self.data.iter().map(|x| x.count_ones()).sum::<u32>(), self.len as u32);
+        debug_assert_eq!(
+            self.data.iter().map(|x| x.count_ones()).sum::<u32>(),
+            self.len as u32
+        );
         self.len
     }
 
@@ -118,9 +121,17 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
         self.len = 0;
     }
 
+    //const LOWER_DIV_BIT_WIDTH: usize = LOWER / BIT_WIDTH;
+    //const LOWER_REM_BIT_WIDTH: usize = LOWER % BIT_WIDTH;
+
     /// Returns the array index and bit position for an element x.
     fn position(x: usize) -> (usize, usize) {
-        (x / BIT_WIDTH, x % BIT_WIDTH)
+        (
+            (x - LOWER) / BIT_WIDTH,
+            (x - LOWER) % BIT_WIDTH,
+            //x / BIT_WIDTH - Self::LOWER_DIV_BIT_WIDTH,
+            //x % BIT_WIDTH - Self::LOWER_REM_BIT_WIDTH,
+        )
     }
 
     /// Return whether an item is part of the set.
@@ -128,13 +139,13 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
-    /// foo.insert(1);
+    /// let mut foo = BitSet::<1, 3, 32>::new();
+    /// foo.insert(3);
     /// foo.insert(10);
     /// foo.insert(5);
     ///
     /// assert_eq!(foo.len(), 3);
-    /// assert!(foo.contains(1));
+    /// assert!(foo.contains(3));
     /// assert!(foo.contains(10));
     /// assert!(foo.contains(5));
     /// ```
