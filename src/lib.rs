@@ -7,6 +7,11 @@ type InputType = usize;
 type BackingType = u64;
 const BIT_WIDTH: InputType = BackingType::BITS as InputType;
 
+// TODO:
+// bench this:
+//   - against IntSet
+//   - against an impl with a vec as a backing type
+
 #[derive(Debug, Clone)]
 pub struct BitSet<const N: usize, const MIN: usize, const MAX: usize> {
     data: [BackingType; N],
@@ -29,8 +34,6 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> Default for BitSet<
 }
 
 impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UPPER> {
-    const _N_FITS: () = assert!(N == ((UPPER - LOWER).div_ceil(BIT_WIDTH)));
-
     /// Construct a new BitSet<N, LOWER, UPPER>, where `LOWER` and `UPPER` are
     /// `usize` integers that denote the boundaries of the BitSet. `N` is the
     /// size of the backing array of the set and, at compile time, it is
@@ -68,6 +71,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// assert_eq!(foo.len(), 2);
     /// ```
     pub fn len(&self) -> usize {
+        debug_assert_eq!(self.data.iter().map(|x| x.count_ones()).sum::<u32>(), self.len as u32);
         self.len
     }
 
@@ -106,9 +110,11 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// assert!(foo.is_empty());
     /// ```
     pub fn clear(&mut self) {
+        // TODO: can I make sure this is vectorized?
         for x in self.data.iter_mut() {
             *x = 0_u64;
         }
+        debug_assert_eq!(self.data.iter().map(|x| x.count_ones()).sum::<u32>(), 0);
         self.len = 0;
     }
 
@@ -134,6 +140,10 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     pub fn contains(&self, x: usize) -> bool {
         let (idx, bit) = Self::position(x);
+        self.is_bit_set(idx, bit)
+    }
+
+    fn is_bit_set(&self, idx: usize, bit: usize) -> bool {
         self.data[idx] & (1 << bit) != 0
     }
 
@@ -173,8 +183,8 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     pub fn remove(&mut self, x: usize) {
         let (idx, bit) = Self::position(x);
+        self.len = self.len.saturating_sub(self.is_bit_set(idx, bit).into());
         self.data[idx] ^= 1 << bit;
-        self.len = self.len.saturating_sub(1);
     }
 
     /// Using the predicate `f` passed to this method, filter the set such that
