@@ -23,13 +23,11 @@
         }:
         let
           buildInputs = [
-            pkgs.gnumake
             pkgs.openssl
             pkgs.pkg-config
-            (pkgs.rust-bin.stable.latest.default.override {
+            (pkgs.rust-bin.stable."1.78.0".default.override {
               extensions = [ "rust-src" "rust-analyzer" "rustfmt" ];
             })
-            pkgs.cargo-nextest
           ];
         in
         {
