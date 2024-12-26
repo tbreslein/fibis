@@ -8,6 +8,9 @@ type BackingType = u64;
 const BIT_WIDTH: InputType = BackingType::BITS as InputType;
 
 // TODO:
+// impl these:
+//   - IntoIterator
+//
 // bench this:
 //   - against IntSet
 //   - against an impl with a vec as a backing type
@@ -121,16 +124,14 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
         self.len = 0;
     }
 
-    //const LOWER_DIV_BIT_WIDTH: usize = LOWER / BIT_WIDTH;
-    //const LOWER_REM_BIT_WIDTH: usize = LOWER % BIT_WIDTH;
+    const LOWER_DIV_BIT_WIDTH: usize = LOWER / BIT_WIDTH;
+    const LOWER_REM_BIT_WIDTH: usize = LOWER % BIT_WIDTH;
 
     /// Returns the array index and bit position for an element x.
     fn position(x: usize) -> (usize, usize) {
         (
-            (x - LOWER) / BIT_WIDTH,
-            (x - LOWER) % BIT_WIDTH,
-            //x / BIT_WIDTH - Self::LOWER_DIV_BIT_WIDTH,
-            //x % BIT_WIDTH - Self::LOWER_REM_BIT_WIDTH,
+            x / BIT_WIDTH - Self::LOWER_DIV_BIT_WIDTH,
+            x % BIT_WIDTH - Self::LOWER_REM_BIT_WIDTH,
         )
     }
 
@@ -245,12 +246,46 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
         todo!()
     }
 
-    pub fn is_disjoint(&self, _other: &Self) -> bool {
-        todo!()
+    /// Returns true of `self` and `other` do not share any elements.
+    ///
+    /// ```should_panic
+    /// use fibis::BitSet;
+    ///
+    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// foo.insert(1);
+    /// foo.insert(2);
+    /// foo.insert(3);
+    ///
+    /// let mut bar = BitSet::<1, 0, 32>::new();
+    /// bar.insert(4);
+    /// bar.insert(5);
+    /// bar.insert(6);
+    ///
+    /// assert!(foo.is_disjoint(&bar));
+    ///
+    /// foo.insert(4);
+    /// assert!(!foo.is_disjoint(&bar));
+    /// ```
+    pub fn is_disjoint(&self, other: &Self) -> bool {
+        for x in self.into_iter() {
+            if other.contains(x) {
+                return false;
+            }
+        }
+        true
     }
 
-    pub fn is_subset(&self, _other: &Self) -> bool {
-        todo!()
+    pub fn is_subset(&self, other: &Self) -> bool {
+        for x in self.into_iter() {
+            if !other.contains(x) {
+                return false;
+            }
+        }
+        true
+    }
+
+    pub fn is_superset(&self, other: &Self) -> bool {
+        other.is_subset(self)
     }
 }
 
