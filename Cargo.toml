@@ -2,3 +2,11 @@
 name = "fibis"
 version = "0.1.0"
 edition = "2021"
+
+[dev-dependencies]
+divan = "0.1.17"
+integer-hasher = "0.1.1"
+
+[[bench]]
+name = "vs_intset"
+harness = false

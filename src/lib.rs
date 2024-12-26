@@ -321,8 +321,8 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> Extend<InputType>
 impl<const N: usize, const LOWER: usize, const UPPER: usize, const M: usize> From<[InputType; M]>
     for BitSet<N, LOWER, UPPER>
 {
-    fn from(_value: [InputType; M]) -> Self {
-        todo!()
+    fn from(value: [InputType; M]) -> Self {
+        Self::from_iter(value)
     }
 }
 
