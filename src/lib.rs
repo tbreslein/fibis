@@ -171,8 +171,8 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// assert!(!foo.contains(1));
     /// ```
     pub fn insert(&mut self, x: usize) {
-        assert!(x >= LOWER);
-        assert!(x <= UPPER);
+        //assert!(x >= LOWER);
+        //assert!(x <= UPPER);
         let (idx, bit) = Self::position(x);
         self.data[idx] |= 1 << bit;
         self.len += 1;
@@ -513,8 +513,8 @@ pub mod vec {
         }
 
         pub fn insert(&mut self, x: usize) {
-            assert!(x >= LOWER);
-            assert!(x <= UPPER);
+            //assert!(x >= LOWER);
+            //assert!(x <= UPPER);
             let (idx, bit) = Self::position(x);
             self.data[idx] |= 1 << bit;
             self.len += 1;
@@ -788,8 +788,8 @@ pub mod vec2 {
         }
 
         pub fn insert(&mut self, x: usize) {
-            assert!(x >= self.lower);
-            assert!(x <= self.upper);
+            //assert!(x >= self.lower);
+            //assert!(x <= self.upper);
             let (idx, bit) = self.position(x);
             self.data[idx] |= 1 << bit;
             self.len += 1;
