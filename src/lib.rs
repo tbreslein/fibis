@@ -8,9 +8,6 @@ type BackingType = u64;
 const BIT_WIDTH: InputType = BackingType::BITS as InputType;
 
 // TODO:
-// impl these:
-//   - IntoIterator
-//
 // bench this:
 //   - against IntSet
 //   - against an impl with a vec as a backing type
@@ -224,6 +221,13 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
         }
     }
 
+    pub fn iter(&self) -> Iter<'_, N, LOWER, UPPER> {
+        Iter {
+            set: self,
+            index: 0,
+        }
+    }
+
     /// Visits the values representing the difference, i.e., the values that are in self but not in other.
     pub fn difference(&self, _other: &Self) -> Difference {
         todo!()
@@ -406,6 +410,24 @@ pub struct SymmetricDifference {}
 pub struct Intersection {}
 pub struct Union {}
 pub struct IntoIter {}
+pub struct Iter<'a, const N: usize, const LOWER: usize, const UPPER: usize> {
+    set: &'a BitSet<N, LOWER, UPPER>,
+    index: usize,
+}
+
+impl<'a, const N: usize, const LOWER: usize, const UPPER: usize> Iterator
+    for Iter<'a, N, LOWER, UPPER>
+{
+    type Item = usize;
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.index < self.set.len {
+            self.index += 1;
+            Some(self.index + LOWER)
+        } else {
+            None
+        }
+    }
+}
 
 impl Iterator for IntoIter {
     type Item = InputType;
