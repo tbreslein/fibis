@@ -1,0 +1,86 @@
+
+running 1 test
+test tests::construction ... ignored
+
+test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+bench                              fastest       │ slowest       │ median        │ mean          │ samples │ iters
+├─ construction                                  │               │               │               │         │
+│  ├─ construction_1_000                         │               │               │               │         │
+│  │  ├─ construction_bitset       769.7 ns      │ 810 ns        │ 782.5 ns      │ 786.7 ns      │ 100     │ 400
+│  │  ├─ construction_bitset_vec   1.01 µs       │ 1.079 µs      │ 1.019 µs      │ 1.021 µs      │ 100     │ 200
+│  │  ├─ construction_bitset_vec2  2.249 µs      │ 9.87 µs       │ 2.269 µs      │ 2.358 µs      │ 100     │ 100
+│  │  ╰─ construction_intset       3.669 µs      │ 8.539 µs      │ 3.679 µs      │ 3.731 µs      │ 100     │ 100
+│  ├─ construction_1_000_000                     │               │               │               │         │
+│  │  ├─ construction_bitset       806.3 µs      │ 873.4 µs      │ 831.3 µs      │ 832.9 µs      │ 100     │ 100
+│  │  ├─ construction_bitset_vec   972 µs        │ 1.037 ms      │ 980.7 µs      │ 983.8 µs      │ 100     │ 100
+│  │  ├─ construction_bitset_vec2  2.186 ms      │ 3.166 ms      │ 3.096 ms      │ 3.046 ms      │ 100     │ 100
+│  │  ╰─ construction_intset       3.697 ms      │ 4.55 ms       │ 3.702 ms      │ 3.717 ms      │ 100     │ 100
+│  ├─ construction_10_000                        │               │               │               │         │
+│  │  ├─ construction_bitset       8.039 µs      │ 11.52 µs      │ 8.169 µs      │ 8.235 µs      │ 100     │ 100
+│  │  ├─ construction_bitset_vec   9.759 µs      │ 12.81 µs      │ 9.77 µs       │ 9.828 µs      │ 100     │ 100
+│  │  ├─ construction_bitset_vec2  30.82 µs      │ 33.53 µs      │ 30.85 µs      │ 30.95 µs      │ 100     │ 100
+│  │  ╰─ construction_intset       36.38 µs      │ 39.06 µs      │ 36.46 µs      │ 36.57 µs      │ 100     │ 100
+│  ├─ construction_100                           │               │               │               │         │
+│  │  ├─ construction_bitset       66.63 ns      │ 73.19 ns      │ 69.13 ns      │ 69.07 ns      │ 100     │ 3200
+│  │  ├─ construction_bitset_vec   86.32 ns      │ 89.47 ns      │ 89.13 ns      │ 88.4 ns       │ 100     │ 3200
+│  │  ├─ construction_bitset_vec2  323.5 ns      │ 331 ns        │ 326 ns        │ 326.2 ns      │ 100     │ 800
+│  │  ╰─ construction_intset       407.2 ns      │ 413.5 ns      │ 408.5 ns      │ 408.6 ns      │ 100     │ 800
+│  ╰─ construction_100_000                       │               │               │               │         │
+│     ├─ construction_bitset       80.56 µs      │ 88.37 µs      │ 84.49 µs      │ 84.88 µs      │ 100     │ 100
+│     ├─ construction_bitset_vec   97.21 µs      │ 101.4 µs      │ 97.23 µs      │ 97.72 µs      │ 100     │ 100
+│     ├─ construction_bitset_vec2  308.2 µs      │ 333.7 µs      │ 308.6 µs      │ 310.1 µs      │ 100     │ 100
+│     ╰─ construction_intset       367 µs        │ 371.6 µs      │ 367.6 µs      │ 368.7 µs      │ 100     │ 100
+├─ contains                                      │               │               │               │         │
+│  ├─ contains_1_000                             │               │               │               │         │
+│  │  ├─ contains_bitset           254.7 ns      │ 1.079 µs      │ 254.7 ns      │ 263.4 ns      │ 100     │ 200
+│  │  ├─ contains_bitset_vec       127.2 ns      │ 127.9 ns      │ 127.8 ns      │ 127.6 ns      │ 100     │ 1600
+│  │  ├─ contains_bitset_vec2      719.7 ns      │ 724.7 ns      │ 722.2 ns      │ 721.8 ns      │ 100     │ 400
+│  │  ╰─ contains_intset           674.7 ns      │ 1.574 µs      │ 677.2 ns      │ 686.8 ns      │ 100     │ 400
+│  ├─ contains_1_000_000                         │               │               │               │         │
+│  │  ├─ contains_bitset           238.3 µs      │ 249.7 µs      │ 238.4 µs      │ 239.9 µs      │ 100     │ 100
+│  │  ├─ contains_bitset_vec       119.4 µs      │ 126.8 µs      │ 119.5 µs      │ 120.3 µs      │ 100     │ 100
+│  │  ├─ contains_bitset_vec2      714.9 µs      │ 726.8 µs      │ 718.3 µs      │ 717.9 µs      │ 100     │ 100
+│  │  ╰─ contains_intset           1.69 ms       │ 3.274 ms      │ 1.703 ms      │ 1.723 ms      │ 100     │ 100
+│  ├─ contains_10_000                            │               │               │               │         │
+│  │  ├─ contains_bitset           1.214 µs      │ 1.244 µs      │ 1.214 µs      │ 1.216 µs      │ 100     │ 200
+│  │  ├─ contains_bitset_vec       1.214 µs      │ 1.239 µs      │ 1.219 µs      │ 1.218 µs      │ 100     │ 200
+│  │  ├─ contains_bitset_vec2      7.159 µs      │ 10.29 µs      │ 7.16 µs       │ 7.194 µs      │ 100     │ 100
+│  │  ╰─ contains_intset           7.299 µs      │ 10.5 µs       │ 7.339 µs      │ 7.377 µs      │ 100     │ 100
+│  ├─ contains_100                               │               │               │               │         │
+│  │  ├─ contains_bitset           12.68 ns      │ 12.73 ns      │ 12.71 ns      │ 12.7 ns       │ 100     │ 25600
+│  │  ├─ contains_bitset_vec       13.78 ns      │ 24.52 ns      │ 13.78 ns      │ 13.89 ns      │ 100     │ 25600
+│  │  ├─ contains_bitset_vec2      72.26 ns      │ 72.6 ns       │ 72.29 ns      │ 72.4 ns       │ 100     │ 3200
+│  │  ╰─ contains_intset           68.19 ns      │ 68.85 ns      │ 68.51 ns      │ 68.54 ns      │ 100     │ 3200
+│  ╰─ contains_100_000                           │               │               │               │         │
+│     ├─ contains_bitset           11.93 µs      │ 17.82 µs      │ 11.95 µs      │ 12.2 µs       │ 100     │ 100
+│     ├─ contains_bitset_vec       11.94 µs      │ 14.98 µs      │ 11.95 µs      │ 11.98 µs      │ 100     │ 100
+│     ├─ contains_bitset_vec2      71.48 µs      │ 74.41 µs      │ 71.51 µs      │ 71.76 µs      │ 100     │ 100
+│     ╰─ contains_intset           120.7 µs      │ 135.6 µs      │ 121.1 µs      │ 122.4 µs      │ 100     │ 100
+╰─ insert                                        │               │               │               │         │
+   ├─ insert_1_000                               │               │               │               │         │
+   │  ├─ contains_bitset           288.5 ns      │ 294.7 ns      │ 291 ns        │ 291.1 ns      │ 100     │ 800
+   │  ├─ contains_bitset_vec       288.5 ns      │ 294.7 ns      │ 292.2 ns      │ 292.1 ns      │ 100     │ 800
+   │  ├─ contains_bitset_vec2      617.2 ns      │ 1.414 µs      │ 619.7 ns      │ 627.7 ns      │ 100     │ 400
+   │  ╰─ contains_intset           3.009 µs      │ 7.45 µs       │ 3.069 µs      │ 3.167 µs      │ 100     │ 100
+   ├─ insert_1_000_000                           │               │               │               │         │
+   │  ├─ contains_bitset           363.2 µs      │ 440.9 µs      │ 388.4 µs      │ 390.2 µs      │ 100     │ 100
+   │  ├─ contains_bitset_vec       305.1 µs      │ 323.6 µs      │ 309.8 µs      │ 310.4 µs      │ 100     │ 100
+   │  ├─ contains_bitset_vec2      713.7 µs      │ 939.3 µs      │ 729.4 µs      │ 731.3 µs      │ 100     │ 100
+   │  ╰─ contains_intset           9.633 ms      │ 13.55 ms      │ 9.891 ms      │ 10 ms         │ 100     │ 100
+   ├─ insert_10_000                              │               │               │               │         │
+   │  ├─ contains_bitset           2.408 µs      │ 2.729 µs      │ 2.519 µs      │ 2.545 µs      │ 100     │ 100
+   │  ├─ contains_bitset_vec       2.249 µs      │ 2.859 µs      │ 2.554 µs      │ 2.535 µs      │ 100     │ 100
+   │  ├─ contains_bitset_vec2      5.298 µs      │ 5.539 µs      │ 5.379 µs      │ 5.375 µs      │ 100     │ 100
+   │  ╰─ contains_intset           27.24 µs      │ 108.9 µs      │ 27.56 µs      │ 29.28 µs      │ 100     │ 100
+   ├─ insert_100                                 │               │               │               │         │
+   │  ├─ contains_bitset           40.38 ns      │ 41.16 ns      │ 40.69 ns      │ 40.68 ns      │ 100     │ 6400
+   │  ├─ contains_bitset_vec       46.63 ns      │ 47.71 ns      │ 47.26 ns      │ 47.21 ns      │ 100     │ 6400
+   │  ├─ contains_bitset_vec2      65.69 ns      │ 68.51 ns      │ 67.26 ns      │ 67.27 ns      │ 100     │ 3200
+   │  ╰─ contains_intset           307.2 ns      │ 336 ns        │ 323.5 ns      │ 322.7 ns      │ 100     │ 800
+   ╰─ insert_100_000                             │               │               │               │         │
+      ├─ contains_bitset           28.95 µs      │ 59.45 µs      │ 40.53 µs      │ 41.01 µs      │ 100     │ 100
+      ├─ contains_bitset_vec       22.44 µs      │ 25.99 µs      │ 22.69 µs      │ 22.79 µs      │ 100     │ 100
+      ├─ contains_bitset_vec2      53.96 µs      │ 66.26 µs      │ 54.15 µs      │ 54.45 µs      │ 100     │ 100
+      ╰─ contains_intset           726.1 µs      │ 1.166 ms      │ 739 µs        │ 743.7 µs      │ 100     │ 100
+

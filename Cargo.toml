@@ -1,14 +1,12 @@
 [package]
 name = "fibis"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 license-file = "LICENSE"
 description = "fixed range bitset"
 repository = "https://www.github.com/tbreslein/fibis.git"
 readme = "README.md"
-exclude = [
-  "./bench_results/*"
-]
+exclude = [ "./bench_results/*" ]
 
 # these are merely used for benchmarks
 [dev-dependencies]
