@@ -13,43 +13,27 @@ const BIT_WIDTH: InputType = BackingType::BITS as InputType;
 //   - against an impl with a vec as a backing type
 
 #[derive(Debug, Clone)]
-pub struct BitSet<const N: usize, const MIN: usize, const MAX: usize> {
-    data: [BackingType; N],
+pub struct BitSet<const MIN: usize, const MAX: usize> {
+    data: Vec<BackingType>,
     len: usize,
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> Default for BitSet<N, LOWER, UPPER> {
+impl<const LOWER: usize, const UPPER: usize> Default for BitSet<LOWER, UPPER> {
     fn default() -> Self {
-        assert_eq!(
-            N,
-            (UPPER - LOWER).div_ceil(BIT_WIDTH),
-            "fibis::BitSet size N must equal (UPPER - LOWER).div_ceil({})",
-            BIT_WIDTH
-        );
         Self {
-            data: [0_u64; N],
+            data: vec![0; (UPPER - LOWER).div_ceil(BIT_WIDTH) + 1],
             len: 0,
         }
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UPPER> {
-    /// Construct a new BitSet<N, LOWER, UPPER>, where `LOWER` and `UPPER` are
-    /// `usize` integers that denote the boundaries of the BitSet. `N` is the
-    /// size of the backing array of the set and, at compile time, it is
-    /// asserted that
-    /// `N == ((UPPER - LOWER).div_ceil(64))`
+impl<const LOWER: usize, const UPPER: usize> BitSet<LOWER, UPPER> {
+    /// Construct a new BitSet<LOWER, UPPER>, where `LOWER` and `UPPER` are
+    /// `usize` integers that denote the boundaries of the BitSet.
     ///
     /// ```
     /// use fibis::BitSet;
-    /// let foo = BitSet::<1, 10, 20>::new(); // (20 - 10).div_ceil(64) == 1
-    /// ```
-    ///
-    /// ```should_panic
-    /// use fibis::BitSet;
-    ///
-    /// // panics, because (512 - 5).div_ceil(64) != 1
-    /// let bar = BitSet::<1, 5, 512>::new();
+    /// let foo = BitSet::<10, 20>::new();
     /// ```
     pub fn new() -> Self {
         Self::default()
@@ -60,7 +44,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// let mut foo = BitSet::<0, 32>::new();
     /// foo.insert(1);
     /// foo.insert(10);
     /// foo.insert(5);
@@ -83,7 +67,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// let mut foo = BitSet::<0, 32>::new();
     /// foo.insert(1);
     /// assert_eq!(foo.len(), 1);
     /// assert!(!foo.is_empty());
@@ -100,7 +84,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// let mut foo = BitSet::<0, 32>::new();
     /// foo.insert(1);
     /// foo.insert(10);
     /// foo.insert(5);
@@ -137,7 +121,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 3, 32>::new();
+    /// let mut foo = BitSet::<3, 32>::new();
     /// foo.insert(3);
     /// foo.insert(10);
     /// foo.insert(5);
@@ -163,17 +147,30 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
-    /// foo.insert(1);
-    /// assert!(foo.contains(1));
+    /// let mut foo = BitSet::<0, 32>::new();
+    /// foo.insert(0);
+    /// foo.insert(10);
+    /// foo.insert(32);
+    /// assert!(foo.contains(0));
+    /// assert!(foo.contains(10));
+    /// assert!(foo.contains(32));
     /// assert!(!foo.contains(2));
-    /// foo.remove(1);
-    /// assert!(!foo.contains(1));
+    ///
+    /// foo.remove(0);
+    /// foo.remove(10);
+    /// foo.remove(32);
+    /// assert!(!foo.contains(0));
+    /// assert!(!foo.contains(10));
+    /// assert!(!foo.contains(32));
     /// ```
     pub fn insert(&mut self, x: usize) {
-        //assert!(x >= LOWER);
-        //assert!(x <= UPPER);
+        assert!(x >= LOWER);
+        assert!(x <= UPPER);
         let (idx, bit) = Self::position(x);
+        //dbg!(x);
+        //dbg!(idx);
+        //dbg!(bit);
+        //panic!("foo");
         self.data[idx] |= 1 << bit;
         self.len += 1;
     }
@@ -183,7 +180,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// let mut foo = BitSet::<0, 32>::new();
     /// foo.insert(1);
     /// assert!(foo.contains(1));
     ///
@@ -202,7 +199,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// let mut foo = BitSet::<0, 32>::new();
     /// foo.insert(1);
     /// foo.insert(2);
     /// foo.insert(3);
@@ -221,7 +218,7 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
         }
     }
 
-    pub fn iter(&self) -> Iter<'_, N, LOWER, UPPER> {
+    pub fn iter(&self) -> Iter<'_, LOWER, UPPER> {
         Iter {
             set: self,
             index: 0,
@@ -255,12 +252,12 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     /// ```should_panic
     /// use fibis::BitSet;
     ///
-    /// let mut foo = BitSet::<1, 0, 32>::new();
+    /// let mut foo = BitSet::<0, 32>::new();
     /// foo.insert(1);
     /// foo.insert(2);
     /// foo.insert(3);
     ///
-    /// let mut bar = BitSet::<1, 0, 32>::new();
+    /// let mut bar = BitSet::<0, 32>::new();
     /// bar.insert(4);
     /// bar.insert(5);
     /// bar.insert(6);
@@ -293,46 +290,42 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> BitSet<N, LOWER, UP
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> BitAnd for BitSet<N, LOWER, UPPER> {
+impl<const LOWER: usize, const UPPER: usize> BitAnd for BitSet<LOWER, UPPER> {
     type Output = Self;
     fn bitand(self, _rhs: Self) -> Self::Output {
         todo!()
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> BitOr for BitSet<N, LOWER, UPPER> {
+impl<const LOWER: usize, const UPPER: usize> BitOr for BitSet<LOWER, UPPER> {
     type Output = Self;
     fn bitor(self, _rhs: Self) -> Self::Output {
         todo!()
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> BitXor for BitSet<N, LOWER, UPPER> {
+impl<const LOWER: usize, const UPPER: usize> BitXor for BitSet<LOWER, UPPER> {
     type Output = Self;
     fn bitxor(self, _rhs: Self) -> Self::Output {
         todo!()
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> Extend<InputType>
-    for BitSet<N, LOWER, UPPER>
-{
+impl<const LOWER: usize, const UPPER: usize> Extend<InputType> for BitSet<LOWER, UPPER> {
     fn extend<I: IntoIterator<Item = InputType>>(&mut self, _iter: I) {
         todo!()
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize, const M: usize> From<[InputType; M]>
-    for BitSet<N, LOWER, UPPER>
+impl<const LOWER: usize, const UPPER: usize, const M: usize> From<[InputType; M]>
+    for BitSet<LOWER, UPPER>
 {
     fn from(value: [InputType; M]) -> Self {
         Self::from_iter(value)
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> FromIterator<InputType>
-    for BitSet<N, LOWER, UPPER>
-{
+impl<const LOWER: usize, const UPPER: usize> FromIterator<InputType> for BitSet<LOWER, UPPER> {
     fn from_iter<I: IntoIterator<Item = InputType>>(iter: I) -> Self {
         let mut s = Self::new();
         for x in iter {
@@ -342,29 +335,23 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> FromIterator<InputT
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> IntoIterator
-    for BitSet<N, LOWER, UPPER>
-{
+impl<const LOWER: usize, const UPPER: usize> IntoIterator for BitSet<LOWER, UPPER> {
     type Item = InputType;
     type IntoIter = IntoIter;
-
     fn into_iter(self) -> Self::IntoIter {
         todo!()
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> IntoIterator
-    for &BitSet<N, LOWER, UPPER>
-{
+impl<const LOWER: usize, const UPPER: usize> IntoIterator for &BitSet<LOWER, UPPER> {
     type Item = InputType;
     type IntoIter = IntoIter;
-
     fn into_iter(self) -> Self::IntoIter {
         todo!()
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> PartialEq for BitSet<N, LOWER, UPPER> {
+impl<const LOWER: usize, const UPPER: usize> PartialEq for BitSet<LOWER, UPPER> {
     fn eq(&self, other: &Self) -> bool {
         if self.len != other.len {
             return false;
@@ -378,9 +365,9 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> PartialEq for BitSe
     }
 }
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> Eq for &BitSet<N, LOWER, UPPER> {}
+impl<const LOWER: usize, const UPPER: usize> Eq for &BitSet<LOWER, UPPER> {}
 
-impl<const N: usize, const LOWER: usize, const UPPER: usize> Sub for &BitSet<N, LOWER, UPPER> {
+impl<const LOWER: usize, const UPPER: usize> Sub for &BitSet<LOWER, UPPER> {
     type Output = Self;
     fn sub(self, _rhs: Self) -> Self::Output {
         // basically just the difference but as a new Set
@@ -388,36 +375,22 @@ impl<const N: usize, const LOWER: usize, const UPPER: usize> Sub for &BitSet<N, 
     }
 }
 
-unsafe impl<const N: usize, const LOWER: usize, const UPPER: usize> Send
-    for BitSet<N, LOWER, UPPER>
-{
-}
-unsafe impl<const N: usize, const LOWER: usize, const UPPER: usize> Sync
-    for BitSet<N, LOWER, UPPER>
-{
-}
-impl<const N: usize, const LOWER: usize, const UPPER: usize> RefUnwindSafe
-    for BitSet<N, LOWER, UPPER>
-{
-}
-impl<const N: usize, const LOWER: usize, const UPPER: usize> UnwindSafe
-    for BitSet<N, LOWER, UPPER>
-{
-}
+unsafe impl<const LOWER: usize, const UPPER: usize> Send for BitSet<LOWER, UPPER> {}
+unsafe impl<const LOWER: usize, const UPPER: usize> Sync for BitSet<LOWER, UPPER> {}
+impl<const LOWER: usize, const UPPER: usize> RefUnwindSafe for BitSet<LOWER, UPPER> {}
+impl<const LOWER: usize, const UPPER: usize> UnwindSafe for BitSet<LOWER, UPPER> {}
 
 pub struct Difference {}
 pub struct SymmetricDifference {}
 pub struct Intersection {}
 pub struct Union {}
 pub struct IntoIter {}
-pub struct Iter<'a, const N: usize, const LOWER: usize, const UPPER: usize> {
-    set: &'a BitSet<N, LOWER, UPPER>,
+pub struct Iter<'a, const LOWER: usize, const UPPER: usize> {
+    set: &'a BitSet<LOWER, UPPER>,
     index: usize,
 }
 
-impl<'a, const N: usize, const LOWER: usize, const UPPER: usize> Iterator
-    for Iter<'a, N, LOWER, UPPER>
-{
+impl<'a, const LOWER: usize, const UPPER: usize> Iterator for Iter<'a, LOWER, UPPER> {
     type Item = usize;
     fn next(&mut self) -> Option<Self::Item> {
         if self.index < self.set.len {
@@ -433,566 +406,5 @@ impl Iterator for IntoIter {
     type Item = InputType;
     fn next(&mut self) -> Option<Self::Item> {
         todo!()
-    }
-}
-
-pub mod vec {
-    use std::{
-        ops::{BitAnd, BitOr, BitXor, Sub},
-        panic::{RefUnwindSafe, UnwindSafe},
-    };
-
-    type InputType = usize;
-    type BackingType = u64;
-    const BIT_WIDTH: InputType = BackingType::BITS as InputType;
-
-    // TODO:
-    // bench this:
-    //   - against IntSet
-    //   - against an impl with a vec as a backing type
-
-    #[derive(Debug, Clone)]
-    pub struct BitSet<const MIN: usize, const MAX: usize> {
-        data: Vec<BackingType>,
-        len: usize,
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> Default for BitSet<LOWER, UPPER> {
-        fn default() -> Self {
-            Self {
-                data: vec![0; (UPPER - LOWER).div_ceil(64)],
-                len: 0,
-            }
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> BitSet<LOWER, UPPER> {
-        pub fn new() -> Self {
-            Self::default()
-        }
-
-        pub fn len(&self) -> usize {
-            debug_assert_eq!(
-                self.data.iter().map(|x| x.count_ones()).sum::<u32>(),
-                self.len as u32
-            );
-            self.len
-        }
-
-        pub fn is_empty(&self) -> bool {
-            self.len == 0
-        }
-
-        pub fn clear(&mut self) {
-            // TODO: can I make sure this is vectorized?
-            for x in self.data.iter_mut() {
-                *x = 0_u64;
-            }
-            debug_assert_eq!(self.data.iter().map(|x| x.count_ones()).sum::<u32>(), 0);
-            self.len = 0;
-        }
-
-        const LOWER_DIV_BIT_WIDTH: usize = LOWER / BIT_WIDTH;
-        const LOWER_REM_BIT_WIDTH: usize = LOWER % BIT_WIDTH;
-
-        /// Returns the array index and bit position for an element x.
-        fn position(x: usize) -> (usize, usize) {
-            (
-                x / BIT_WIDTH - Self::LOWER_DIV_BIT_WIDTH,
-                x % BIT_WIDTH - Self::LOWER_REM_BIT_WIDTH,
-            )
-        }
-
-        pub fn contains(&self, x: usize) -> bool {
-            let (idx, bit) = Self::position(x);
-            self.is_bit_set(idx, bit)
-        }
-
-        fn is_bit_set(&self, idx: usize, bit: usize) -> bool {
-            self.data[idx] & (1 << bit) != 0
-        }
-
-        pub fn insert(&mut self, x: usize) {
-            //assert!(x >= LOWER);
-            //assert!(x <= UPPER);
-            let (idx, bit) = Self::position(x);
-            self.data[idx] |= 1 << bit;
-            self.len += 1;
-        }
-
-        pub fn remove(&mut self, x: usize) {
-            let (idx, bit) = Self::position(x);
-            self.len = self.len.saturating_sub(self.is_bit_set(idx, bit).into());
-            self.data[idx] ^= 1 << bit;
-        }
-
-        pub fn retain(&mut self, f: impl Fn(usize) -> bool) {
-            for x in LOWER..=UPPER {
-                if !f(x) {
-                    self.remove(x);
-                }
-            }
-        }
-
-        pub fn iter(&self) -> Iter<'_, LOWER, UPPER> {
-            Iter {
-                set: self,
-                index: 0,
-            }
-        }
-
-        /// Visits the values representing the difference, i.e., the values that are in self but not in other.
-        pub fn difference(&self, _other: &Self) -> Difference {
-            todo!()
-        }
-
-        /// Visits the values representing the symmetric difference, i.e., the values that are in self or in other but not in both.
-        pub fn symmetric_difference(&self, _other: &Self) -> SymmetricDifference {
-            todo!()
-        }
-
-        /// Visits the values representing the intersection, i.e., the values that are both in self and other.
-        ///
-        /// When an equal element is present in self and other then the resulting Intersection may yield references to one or the other. This can be relevant if T contains fields which are not compared by its Eq implementation, and may hold different value between the two equal copies of T in the two sets.
-        pub fn intersection(&self, _other: &Self) -> Intersection {
-            todo!()
-        }
-
-        /// Visits the values representing the union, i.e., all the values in self or other, without duplicates.
-        pub fn union(&self, _other: &Self) -> Union {
-            todo!()
-        }
-
-        pub fn is_disjoint(&self, other: &Self) -> bool {
-            for x in self.into_iter() {
-                if other.contains(x) {
-                    return false;
-                }
-            }
-            true
-        }
-
-        pub fn is_subset(&self, other: &Self) -> bool {
-            for x in self.into_iter() {
-                if !other.contains(x) {
-                    return false;
-                }
-            }
-            true
-        }
-
-        pub fn is_superset(&self, other: &Self) -> bool {
-            other.is_subset(self)
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> BitAnd for BitSet<LOWER, UPPER> {
-        type Output = Self;
-        fn bitand(self, _rhs: Self) -> Self::Output {
-            todo!()
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> BitOr for BitSet<LOWER, UPPER> {
-        type Output = Self;
-        fn bitor(self, _rhs: Self) -> Self::Output {
-            todo!()
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> BitXor for BitSet<LOWER, UPPER> {
-        type Output = Self;
-        fn bitxor(self, _rhs: Self) -> Self::Output {
-            todo!()
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> Extend<InputType> for BitSet<LOWER, UPPER> {
-        fn extend<I: IntoIterator<Item = InputType>>(&mut self, _iter: I) {
-            todo!()
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize, const M: usize> From<[InputType; M]>
-        for BitSet<LOWER, UPPER>
-    {
-        fn from(value: [InputType; M]) -> Self {
-            Self::from_iter(value)
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> FromIterator<InputType> for BitSet<LOWER, UPPER> {
-        fn from_iter<I: IntoIterator<Item = InputType>>(iter: I) -> Self {
-            let mut s = Self::new();
-            for x in iter {
-                s.insert(x);
-            }
-            s
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> IntoIterator for BitSet<LOWER, UPPER> {
-        type Item = InputType;
-        type IntoIter = IntoIter;
-
-        fn into_iter(self) -> Self::IntoIter {
-            todo!()
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> IntoIterator for &BitSet<LOWER, UPPER> {
-        type Item = InputType;
-        type IntoIter = IntoIter;
-
-        fn into_iter(self) -> Self::IntoIter {
-            todo!()
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> PartialEq for BitSet<LOWER, UPPER> {
-        fn eq(&self, other: &Self) -> bool {
-            if self.len != other.len {
-                return false;
-            }
-            for (x, y) in self.into_iter().zip(other) {
-                if x != y {
-                    return false;
-                }
-            }
-            true
-        }
-    }
-
-    impl<const LOWER: usize, const UPPER: usize> Eq for &BitSet<LOWER, UPPER> {}
-
-    impl<const LOWER: usize, const UPPER: usize> Sub for &BitSet<LOWER, UPPER> {
-        type Output = Self;
-        fn sub(self, _rhs: Self) -> Self::Output {
-            // basically just the difference but as a new Set
-            todo!()
-        }
-    }
-
-    unsafe impl<const LOWER: usize, const UPPER: usize> Send for BitSet<LOWER, UPPER> {}
-    unsafe impl<const LOWER: usize, const UPPER: usize> Sync for BitSet<LOWER, UPPER> {}
-    impl<const LOWER: usize, const UPPER: usize> RefUnwindSafe for BitSet<LOWER, UPPER> {}
-    impl<const LOWER: usize, const UPPER: usize> UnwindSafe for BitSet<LOWER, UPPER> {}
-
-    pub struct Difference {}
-    pub struct SymmetricDifference {}
-    pub struct Intersection {}
-    pub struct Union {}
-    pub struct IntoIter {}
-    pub struct Iter<'a, const LOWER: usize, const UPPER: usize> {
-        set: &'a BitSet<LOWER, UPPER>,
-        index: usize,
-    }
-
-    impl<'a, const LOWER: usize, const UPPER: usize> Iterator for Iter<'a, LOWER, UPPER> {
-        type Item = usize;
-        fn next(&mut self) -> Option<Self::Item> {
-            if self.index < self.set.len {
-                self.index += 1;
-                Some(self.index + LOWER)
-            } else {
-                None
-            }
-        }
-    }
-
-    impl Iterator for IntoIter {
-        type Item = InputType;
-        fn next(&mut self) -> Option<Self::Item> {
-            todo!()
-        }
-    }
-}
-
-pub mod vec2 {
-    use std::{
-        ops::{BitAnd, BitOr, BitXor, Sub},
-        panic::{RefUnwindSafe, UnwindSafe},
-    };
-
-    type InputType = usize;
-    type BackingType = u64;
-    const BIT_WIDTH: InputType = BackingType::BITS as InputType;
-
-    // TODO:
-    // bench this:
-    //   - against IntSet
-    //   - against an impl with a vec as a backing type
-
-    #[derive(Debug, Clone)]
-    pub struct BitSet {
-        data: Vec<BackingType>,
-        len: usize,
-        lower: usize,
-        upper: usize,
-        lower_div_bit_width: usize,
-        lower_rem_bit_width: usize,
-    }
-
-    impl BitSet {
-        pub fn new(lower: usize, upper: usize) -> Self {
-            let size = (upper - lower).div_ceil(64);
-            Self {
-                data: vec![0; size],
-                len: 0,
-                lower,
-                upper,
-                lower_div_bit_width: lower / BIT_WIDTH,
-                lower_rem_bit_width: lower % BIT_WIDTH,
-            }
-        }
-
-        pub fn len(&self) -> usize {
-            debug_assert_eq!(
-                self.data.iter().map(|x| x.count_ones()).sum::<u32>(),
-                self.len as u32
-            );
-            self.len
-        }
-
-        pub fn is_empty(&self) -> bool {
-            self.len == 0
-        }
-
-        pub fn clear(&mut self) {
-            // TODO: can I make sure this is vectorized?
-            for x in self.data.iter_mut() {
-                *x = 0_u64;
-            }
-            debug_assert_eq!(self.data.iter().map(|x| x.count_ones()).sum::<u32>(), 0);
-            self.len = 0;
-        }
-
-        //const LOWER_DIV_BIT_WIDTH: usize = LOWER / BIT_WIDTH;
-        //const LOWER_REM_BIT_WIDTH: usize = LOWER % BIT_WIDTH;
-
-        /// Returns the array index and bit position for an element x.
-        fn position(&self, x: usize) -> (usize, usize) {
-            (
-                x / BIT_WIDTH - self.lower_div_bit_width,
-                x % BIT_WIDTH - self.lower_rem_bit_width,
-            )
-        }
-
-        pub fn contains(&self, x: usize) -> bool {
-            let (idx, bit) = self.position(x);
-            self.is_bit_set(idx, bit)
-        }
-
-        fn is_bit_set(&self, idx: usize, bit: usize) -> bool {
-            self.data[idx] & (1 << bit) != 0
-        }
-
-        pub fn insert(&mut self, x: usize) {
-            //assert!(x >= self.lower);
-            //assert!(x <= self.upper);
-            let (idx, bit) = self.position(x);
-            self.data[idx] |= 1 << bit;
-            self.len += 1;
-        }
-
-        pub fn remove(&mut self, x: usize) {
-            let (idx, bit) = self.position(x);
-            self.len = self.len.saturating_sub(self.is_bit_set(idx, bit).into());
-            self.data[idx] ^= 1 << bit;
-        }
-
-        pub fn retain(&mut self, f: impl Fn(usize) -> bool) {
-            for x in self.lower..=self.upper {
-                if !f(x) {
-                    self.remove(x);
-                }
-            }
-        }
-
-        pub fn iter(&self) -> Iter<'_> {
-            Iter {
-                set: self,
-                index: 0,
-            }
-        }
-
-        /// Visits the values representing the difference, i.e., the values that are in self but not in other.
-        pub fn difference(&self, _other: &Self) -> Difference {
-            todo!()
-        }
-
-        /// Visits the values representing the symmetric difference, i.e., the values that are in self or in other but not in both.
-        pub fn symmetric_difference(&self, _other: &Self) -> SymmetricDifference {
-            todo!()
-        }
-
-        /// Visits the values representing the intersection, i.e., the values that are both in self and other.
-        ///
-        /// When an equal element is present in self and other then the resulting Intersection may yield references to one or the other. This can be relevant if T contains fields which are not compared by its Eq implementation, and may hold different value between the two equal copies of T in the two sets.
-        pub fn intersection(&self, _other: &Self) -> Intersection {
-            todo!()
-        }
-
-        /// Visits the values representing the union, i.e., all the values in self or other, without duplicates.
-        pub fn union(&self, _other: &Self) -> Union {
-            todo!()
-        }
-
-        pub fn is_disjoint(&self, other: &Self) -> bool {
-            for x in self.into_iter() {
-                if other.contains(x) {
-                    return false;
-                }
-            }
-            true
-        }
-
-        pub fn is_subset(&self, other: &Self) -> bool {
-            for x in self.into_iter() {
-                if !other.contains(x) {
-                    return false;
-                }
-            }
-            true
-        }
-
-        pub fn is_superset(&self, other: &Self) -> bool {
-            other.is_subset(self)
-        }
-    }
-
-    impl BitAnd for BitSet {
-        type Output = Self;
-        fn bitand(self, _rhs: Self) -> Self::Output {
-            todo!()
-        }
-    }
-
-    impl BitOr for BitSet {
-        type Output = Self;
-        fn bitor(self, _rhs: Self) -> Self::Output {
-            todo!()
-        }
-    }
-
-    impl BitXor for BitSet {
-        type Output = Self;
-        fn bitxor(self, _rhs: Self) -> Self::Output {
-            todo!()
-        }
-    }
-
-    impl Extend<InputType> for BitSet {
-        fn extend<I: IntoIterator<Item = InputType>>(&mut self, _iter: I) {
-            todo!()
-        }
-    }
-
-    impl<const M: usize> From<[InputType; M]> for BitSet {
-        fn from(value: [InputType; M]) -> Self {
-            Self::from_iter(value)
-        }
-    }
-
-    impl FromIterator<InputType> for BitSet {
-        fn from_iter<I: IntoIterator<Item = InputType>>(iter: I) -> Self {
-            let input: Vec<InputType> = iter.into_iter().collect();
-            let lower = input.iter().min().unwrap();
-            let upper = input.iter().max().unwrap();
-
-            let mut s = Self::new(*lower, *upper);
-            for x in input {
-                s.insert(x);
-            }
-            s
-        }
-    }
-
-    impl IntoIterator for BitSet {
-        type Item = InputType;
-        type IntoIter = IntoIter;
-
-        fn into_iter(self) -> Self::IntoIter {
-            todo!()
-        }
-    }
-
-    impl IntoIterator for &BitSet {
-        type Item = InputType;
-        type IntoIter = IntoIter;
-
-        fn into_iter(self) -> Self::IntoIter {
-            todo!()
-        }
-    }
-
-    impl PartialEq for BitSet {
-        fn eq(&self, other: &Self) -> bool {
-            if self.len != other.len {
-                return false;
-            }
-            for (x, y) in self.into_iter().zip(other) {
-                if x != y {
-                    return false;
-                }
-            }
-            true
-        }
-    }
-
-    impl Eq for &BitSet {}
-
-    impl Sub for &BitSet {
-        type Output = Self;
-        fn sub(self, _rhs: Self) -> Self::Output {
-            // basically just the difference but as a new Set
-            todo!()
-        }
-    }
-
-    unsafe impl Send for BitSet {}
-    unsafe impl Sync for BitSet {}
-    impl RefUnwindSafe for BitSet {}
-    impl UnwindSafe for BitSet {}
-
-    pub struct Difference {}
-    pub struct SymmetricDifference {}
-    pub struct Intersection {}
-    pub struct Union {}
-    pub struct IntoIter {}
-    pub struct Iter<'a> {
-        set: &'a BitSet,
-        index: usize,
-    }
-
-    impl<'a> Iterator for Iter<'a> {
-        type Item = usize;
-        fn next(&mut self) -> Option<Self::Item> {
-            if self.index < self.set.len {
-                self.index += 1;
-                Some(self.index + self.set.lower)
-            } else {
-                None
-            }
-        }
-    }
-
-    impl Iterator for IntoIter {
-        type Item = InputType;
-        fn next(&mut self) -> Option<Self::Item> {
-            todo!()
-        }
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    // TODO: move this into doctests
-    fn construction() {
-        let x = BitSet::<1, 0, 10>::new();
-        assert_eq!(x.len(), 0);
     }
 }

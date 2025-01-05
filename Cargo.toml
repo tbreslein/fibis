@@ -10,7 +10,7 @@ exclude = [ "./bench_results/*" ]
 
 # these are merely used for benchmarks
 [dev-dependencies]
-divan = "0.1.17"
+criterion = "0.5.1"
 integer-hasher = "0.1.1"
 rand = "0.8.5"
 
