@@ -14,6 +14,9 @@ criterion = "0.5.1"
 integer-hasher = "0.1.1"
 rand = "0.8.5"
 
+[lib]
+bench = false
+
 [[bench]]
 name = "bench"
 harness = false

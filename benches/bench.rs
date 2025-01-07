@@ -1,4 +1,7 @@
+#![allow(clippy::unit_arg)]
+
 use criterion::{black_box, criterion_group, criterion_main, Criterion};
+use fibis::BitSet;
 use integer_hasher::{BuildIntHasher, IntSet};
 use rand::Rng;
 use std::collections::HashSet;
@@ -7,10 +10,9 @@ fn construction<const LOWER: usize, const UPPER: usize>(c: &mut Criterion) {
     c.bench_function(&format!("construct intset {}", UPPER).to_string(), |b| {
         b.iter(|| black_box(IntSet::from_iter(LOWER..=UPPER)))
     });
-    c.bench_function(
-        &format!("construct fibis::BitSet {}", UPPER).to_string(),
-        |b| b.iter(|| black_box(fibis::BitSet::<LOWER, UPPER>::from_iter(LOWER..=UPPER))),
-    );
+    c.bench_function(&format!("construct BitSet {}", UPPER).to_string(), |b| {
+        b.iter(|| black_box(BitSet::<LOWER, UPPER>::from_iter(LOWER..=UPPER)))
+    });
 }
 
 fn get_rng(lower: usize, upper: usize) -> Vec<usize> {
@@ -22,49 +24,42 @@ fn get_rng(lower: usize, upper: usize) -> Vec<usize> {
 
 fn insertion<const LOWER: usize, const UPPER: usize>(c: &mut Criterion) {
     let rng = get_rng(LOWER, UPPER);
+    let mut s: IntSet<usize> = HashSet::with_capacity_and_hasher(UPPER, BuildIntHasher::default());
     c.bench_function(&format!("insert intset {}", UPPER).to_string(), |b| {
-        let mut s: IntSet<usize> =
-            HashSet::with_capacity_and_hasher(UPPER, BuildIntHasher::default());
         b.iter(|| {
             for x in rng.iter() {
-                let _ = s.insert(*x);
+                black_box(s.insert(*x));
             }
         })
     });
-    c.bench_function(
-        &format!("insert fibis::BitSet {}", UPPER).to_string(),
-        |b| {
-            let mut s = fibis::BitSet::<LOWER, UPPER>::new();
-            b.iter(|| {
-                for x in rng.iter() {
-                    s.insert(*x);
-                }
-            })
-        },
-    );
+    let mut s = BitSet::<LOWER, UPPER>::new();
+    c.bench_function(&format!("insert BitSet {}", UPPER).to_string(), |b| {
+        b.iter(|| {
+            for x in rng.iter() {
+                black_box(s.insert(*x));
+            }
+        })
+    });
 }
 
 fn contains<const LOWER: usize, const UPPER: usize>(c: &mut Criterion) {
     let rng = get_rng(LOWER, UPPER);
+    let s = IntSet::from_iter(LOWER..=UPPER);
     c.bench_function(&format!("contains intset {}", UPPER).to_string(), |b| {
-        let s = IntSet::from_iter(LOWER..=UPPER);
         b.iter(|| {
             for x in rng.iter() {
-                let _ = s.contains(x);
+                black_box(s.contains(x));
             }
         })
     });
-    c.bench_function(
-        &format!("contains fibis::BitSet {}", UPPER).to_string(),
-        |b| {
-            let s = fibis::BitSet::<LOWER, UPPER>::from_iter(LOWER..=UPPER);
-            b.iter(|| {
-                for x in rng.iter() {
-                    s.contains(*x);
-                }
-            })
-        },
-    );
+    let s = BitSet::<LOWER, UPPER>::from_iter(LOWER..=UPPER);
+    c.bench_function(&format!("contains BitSet {}", UPPER).to_string(), |b| {
+        b.iter(|| {
+            for x in rng.iter() {
+                black_box(s.contains(*x));
+            }
+        })
+    });
 }
 
 criterion_group!(
