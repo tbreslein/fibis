@@ -1,86 +1,44 @@
+test construct intset 100 ... bench:         218 ns/iter (+/- 23)
+test construct BitSet 100 ... bench:         167 ns/iter (+/- 4)
 
-running 1 test
-test tests::construction ... ignored
+test construct intset 1000 ... bench:        1947 ns/iter (+/- 162)
+test construct BitSet 1000 ... bench:        1902 ns/iter (+/- 67)
 
-test result: ok. 0 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.00s
+test construct intset 10000 ... bench:       19255 ns/iter (+/- 583)
+test construct BitSet 10000 ... bench:       19193 ns/iter (+/- 604)
 
-bench                              fastest       │ slowest       │ median        │ mean          │ samples │ iters
-├─ construction                                  │               │               │               │         │
-│  ├─ construction_1_000                         │               │               │               │         │
-│  │  ├─ construction_bitset       1.843 µs      │ 1.905 µs      │ 1.864 µs      │ 1.862 µs      │ 100     │ 400
-│  │  ├─ construction_bitset_vec   1.812 µs      │ 3.207 µs      │ 1.874 µs      │ 1.883 µs      │ 100     │ 400
-│  │  ├─ construction_bitset_vec2  3.145 µs      │ 3.291 µs      │ 3.187 µs      │ 3.187 µs      │ 100     │ 200
-│  │  ╰─ construction_intset       2.457 µs      │ 3.332 µs      │ 2.478 µs      │ 2.55 µs       │ 100     │ 200
-│  ├─ construction_1_000_000                     │               │               │               │         │
-│  │  ├─ construction_bitset       1.869 ms      │ 1.968 ms      │ 1.879 ms      │ 1.884 ms      │ 100     │ 100
-│  │  ├─ construction_bitset_vec   1.946 ms      │ 1.992 ms      │ 1.961 ms      │ 1.964 ms      │ 100     │ 100
-│  │  ├─ construction_bitset_vec2  3.39 ms       │ 4.342 ms      │ 3.446 ms      │ 3.474 ms      │ 100     │ 100
-│  │  ╰─ construction_intset       2.469 ms      │ 3.57 ms       │ 2.515 ms      │ 2.525 ms      │ 100     │ 100
-│  ├─ construction_10_000                        │               │               │               │         │
-│  │  ├─ construction_bitset       18.58 µs      │ 23.37 µs      │ 18.95 µs      │ 19.03 µs      │ 100     │ 100
-│  │  ├─ construction_bitset_vec   18.7 µs       │ 20.7 µs       │ 19.45 µs      │ 19.39 µs      │ 100     │ 100
-│  │  ├─ construction_bitset_vec2  31.49 µs      │ 75.37 µs      │ 31.58 µs      │ 32.36 µs      │ 100     │ 100
-│  │  ╰─ construction_intset       24.45 µs      │ 37.7 µs       │ 24.54 µs      │ 25.21 µs      │ 100     │ 100
-│  ├─ construction_100                           │               │               │               │         │
-│  │  ├─ construction_bitset       142.8 ns      │ 149.4 ns      │ 145.4 ns      │ 145.1 ns      │ 100     │ 3200
-│  │  ├─ construction_bitset_vec   162.4 ns      │ 167.6 ns      │ 163.7 ns      │ 163.7 ns      │ 100     │ 3200
-│  │  ├─ construction_bitset_vec2  338.2 ns      │ 757.4 ns      │ 348.5 ns      │ 352.8 ns      │ 100     │ 1600
-│  │  ╰─ construction_intset       267.8 ns      │ 275.6 ns      │ 270.4 ns      │ 270.2 ns      │ 100     │ 1600
-│  ╰─ construction_100_000                       │               │               │               │         │
-│     ├─ construction_bitset       188.4 µs      │ 230.2 µs      │ 190 µs        │ 193.7 µs      │ 100     │ 100
-│     ├─ construction_bitset_vec   209.6 µs      │ 226 µs        │ 209.8 µs      │ 210.8 µs      │ 100     │ 100
-│     ├─ construction_bitset_vec2  314.9 µs      │ 421.2 µs      │ 315.6 µs      │ 318.7 µs      │ 100     │ 100
-│     ╰─ construction_intset       244.7 µs      │ 343.7 µs      │ 244.8 µs      │ 247.8 µs      │ 100     │ 100
-├─ contains                                      │               │               │               │         │
-│  ├─ contains_1_000                             │               │               │               │         │
-│  │  ├─ contains_bitset           162.4 ns      │ 573.8 ns      │ 166.3 ns      │ 170.2 ns      │ 100     │ 3200
-│  │  ├─ contains_bitset_vec       167.6 ns      │ 399.4 ns      │ 168.9 ns      │ 171.8 ns      │ 100     │ 3200
-│  │  ├─ contains_bitset_vec2      429.3 ns      │ 864.2 ns      │ 434.5 ns      │ 438.6 ns      │ 100     │ 1600
-│  │  ╰─ contains_intset           473.5 ns      │ 1.03 µs       │ 478.8 ns      │ 484.7 ns      │ 100     │ 1600
-│  ├─ contains_1_000_000                         │               │               │               │         │
-│  │  ├─ contains_bitset           145.4 µs      │ 181.4 µs      │ 145.9 µs      │ 148.4 µs      │ 100     │ 100
-│  │  ├─ contains_bitset_vec       165.2 µs      │ 203.7 µs      │ 177.8 µs      │ 178.8 µs      │ 100     │ 100
-│  │  ├─ contains_bitset_vec2      428 µs        │ 470.2 µs      │ 428.1 µs      │ 432.8 µs      │ 100     │ 100
-│  │  ╰─ contains_intset           718.4 µs      │ 854.7 µs      │ 723.5 µs      │ 728.9 µs      │ 100     │ 100
-│  ├─ contains_10_000                            │               │               │               │         │
-│  │  ├─ contains_bitset           1.499 µs      │ 1.947 µs      │ 1.541 µs      │ 1.557 µs      │ 100     │ 400
-│  │  ├─ contains_bitset_vec       1.478 µs      │ 1.634 µs      │ 1.53 µs       │ 1.537 µs      │ 100     │ 400
-│  │  ├─ contains_bitset_vec2      4.249 µs      │ 4.416 µs      │ 4.291 µs      │ 4.295 µs      │ 100     │ 100
-│  │  ╰─ contains_intset           4.916 µs      │ 5.374 µs      │ 5.208 µs      │ 5.174 µs      │ 100     │ 100
-│  ├─ contains_100                               │               │               │               │         │
-│  │  ├─ contains_bitset           14.7 ns       │ 14.95 ns      │ 14.79 ns      │ 14.79 ns      │ 100     │ 51200
-│  │  ├─ contains_bitset_vec       14.95 ns      │ 20.48 ns      │ 15.11 ns      │ 15.34 ns      │ 100     │ 51200
-│  │  ├─ contains_bitset_vec2      47.82 ns      │ 49.13 ns      │ 48.48 ns      │ 48.54 ns      │ 100     │ 12800
-│  │  ╰─ contains_intset           51.74 ns      │ 54.02 ns      │ 53.52 ns      │ 53.44 ns      │ 100     │ 12800
-│  ╰─ contains_100_000                           │               │               │               │         │
-│     ├─ contains_bitset           16.12 µs      │ 19.33 µs      │ 19.16 µs      │ 18.75 µs      │ 100     │ 100
-│     ├─ contains_bitset_vec       16.12 µs      │ 19.37 µs      │ 19.16 µs      │ 18.67 µs      │ 100     │ 100
-│     ├─ contains_bitset_vec2      42.79 µs      │ 42.99 µs      │ 42.83 µs      │ 42.84 µs      │ 100     │ 100
-│     ╰─ contains_intset           58.7 µs       │ 68.79 µs      │ 59.12 µs      │ 59.54 µs      │ 100     │ 100
-╰─ insert                                        │               │               │               │         │
-   ├─ insert_1_000                               │               │               │               │         │
-   │  ├─ contains_bitset           273 ns        │ 288.7 ns      │ 280.9 ns      │ 280.7 ns      │ 100     │ 1600
-   │  ├─ contains_bitset_vec       257.4 ns      │ 275.7 ns      │ 265.2 ns      │ 264.7 ns      │ 100     │ 1600
-   │  ├─ contains_bitset_vec2      926.6 ns      │ 984 ns        │ 937.1 ns      │ 942.6 ns      │ 100     │ 800
-   │  ╰─ contains_intset           1.957 µs      │ 7.332 µs      │ 2.041 µs      │ 2.124 µs      │ 100     │ 100
-   ├─ insert_1_000_000                           │               │               │               │         │
-   │  ├─ contains_bitset           950.1 µs      │ 1.016 ms      │ 953.5 µs      │ 957.1 µs      │ 100     │ 100
-   │  ├─ contains_bitset_vec       243.1 µs      │ 272 µs        │ 245.3 µs      │ 248.2 µs      │ 100     │ 100
-   │  ├─ contains_bitset_vec2      945.8 µs      │ 1.204 ms      │ 959.6 µs      │ 977.1 µs      │ 100     │ 100
-   │  ╰─ contains_intset           6.55 ms       │ 8.997 ms      │ 6.657 ms      │ 6.7 ms        │ 100     │ 100
-   ├─ insert_10_000                              │               │               │               │         │
-   │  ├─ contains_bitset           2.687 µs      │ 8.52 µs       │ 2.708 µs      │ 2.846 µs      │ 100     │ 200
-   │  ├─ contains_bitset_vec       2.27 µs       │ 5.582 µs      │ 2.395 µs      │ 2.418 µs      │ 100     │ 200
-   │  ├─ contains_bitset_vec2      9.165 µs      │ 9.374 µs      │ 9.249 µs      │ 9.242 µs      │ 100     │ 100
-   │  ╰─ contains_intset           31.45 µs      │ 79.45 µs      │ 31.79 µs      │ 33.76 µs      │ 100     │ 100
-   ├─ insert_100                                 │               │               │               │         │
-   │  ├─ contains_bitset           51.74 ns      │ 53.69 ns      │ 52.7 ns       │ 52.6 ns       │ 100     │ 12800
-   │  ├─ contains_bitset_vec       65.4 ns       │ 67.35 ns      │ 66.06 ns      │ 66.26 ns      │ 100     │ 6400
-   │  ├─ contains_bitset_vec2      93.4 ns       │ 96.01 ns      │ 94.7 ns       │ 94.54 ns      │ 100     │ 6400
-   │  ╰─ contains_intset           234 ns        │ 270.4 ns      │ 244.4 ns      │ 246.3 ns      │ 100     │ 1600
-   ╰─ insert_100_000                             │               │               │               │         │
-      ├─ contains_bitset           27.2 µs       │ 27.54 µs      │ 27.33 µs      │ 27.33 µs      │ 100     │ 100
-      ├─ contains_bitset_vec       24.04 µs      │ 38.74 µs      │ 24.33 µs      │ 24.52 µs      │ 100     │ 100
-      ├─ contains_bitset_vec2      92.08 µs      │ 103 µs        │ 92.24 µs      │ 92.71 µs      │ 100     │ 100
-      ╰─ contains_intset           591.2 µs      │ 728.8 µs      │ 598.9 µs      │ 603 µs        │ 100     │ 100
+test construct intset 100000 ... bench:      192277 ns/iter (+/- 6017)
+test construct BitSet 100000 ... bench:      191929 ns/iter (+/- 6787)
 
+test construct intset 1000000 ... bench:     1960095 ns/iter (+/- 96563)
+test construct BitSet 1000000 ... bench:     1940932 ns/iter (+/- 27855)
+
+test insert intset 100 ... bench:          66 ns/iter (+/- 0)
+test insert BitSet 100 ... bench:          83 ns/iter (+/- 0)
+
+test insert intset 1000 ... bench:         668 ns/iter (+/- 21)
+test insert BitSet 1000 ... bench:         297 ns/iter (+/- 12)
+
+test insert intset 10000 ... bench:        6695 ns/iter (+/- 259)
+test insert BitSet 10000 ... bench:        2873 ns/iter (+/- 16)
+
+test insert intset 100000 ... bench:       80119 ns/iter (+/- 3076)
+test insert BitSet 100000 ... bench:       28937 ns/iter (+/- 238)
+
+test insert intset 1000000 ... bench:      958061 ns/iter (+/- 45137)
+test insert BitSet 1000000 ... bench:      295254 ns/iter (+/- 10133)
+
+test contains intset 100 ... bench:          59 ns/iter (+/- 1)
+test contains BitSet 100 ... bench:          22 ns/iter (+/- 3)
+
+test contains intset 1000 ... bench:         584 ns/iter (+/- 18)
+test contains BitSet 1000 ... bench:         225 ns/iter (+/- 8)
+
+test contains intset 10000 ... bench:        6094 ns/iter (+/- 173)
+test contains BitSet 10000 ... bench:        2211 ns/iter (+/- 177)
+
+test contains intset 100000 ... bench:       69544 ns/iter (+/- 1845)
+test contains BitSet 100000 ... bench:       23035 ns/iter (+/- 878)
+
+test contains intset 1000000 ... bench:      830553 ns/iter (+/- 48834)
+test contains BitSet 1000000 ... bench:      241406 ns/iter (+/- 5945)
